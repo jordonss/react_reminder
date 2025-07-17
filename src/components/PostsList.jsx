@@ -1,53 +1,25 @@
-import { useState, useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 import Post from "./Post";
 import classes from "./PostsList.module.css";
 
 function PostsLists() {
-  const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const posts = useLoaderData();
 
-  useEffect(() => {
-    async function fetchPosts() {
-      setIsLoading(true);
-      const response = await fetch("http://localhost:8080/posts");
-      const data = await response.json();
-      setPosts(data.posts);
-      setIsLoading(false);
-    }
-    fetchPosts().catch((error) => {
-      console.error("Failed to fetch posts:", error);
-    });
-  }, []);
 
-  function addPostHandler(postData) {
-    fetch("http://localhost:8080/posts", {
-      method: "POST",
-      body: JSON.stringify(postData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    setPosts((prevPosts) => [postData, ...prevPosts]);
-  }
 
   return (
     <>
-      {!isLoading && posts.length === 0 && (
+      {posts.length === 0 && (
         <div style={{ textAlign: "center", color: "white" }}>
           <h2>No posts yet!</h2>
         </div>
       )}
-      {!isLoading && (
+      {posts.length > 0 && (
         <ul className={classes.posts}>
           {posts.map((post, index) => (
-            <Post key={index} author={post.author} body={post.body} />
+            <Post key={index} id={post.id} author={post.author} body={post.body} />
           ))}
         </ul>
-      )}
-      {isLoading && (
-        <div style={{ textAlign: "center", color: "white" }}>
-          <h2>Loading posts...</h2>
-        </div>
       )}
     </>
   );
